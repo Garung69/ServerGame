@@ -25,7 +25,7 @@ app.get('/nftdetail/:id', function (req, res) {
         {
             "name": "NFT for test #" + req.params.id,
             "description": "This is one items in the list of the Test Game Blockchain Collection",
-            "image_url": "http://" + req.params.id + ".png",
+            "image_url": "http://testnftblockchain.herokuapp.com/nftimage/" + req.params.id + ".png",
             "tokenId": req.params.id,
         })));
 })
