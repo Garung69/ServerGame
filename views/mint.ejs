@@ -1,0 +1,86 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet"
+        integrity="sha384-1BmE4kWBq78iYhFldvKuhfTAU6auU8tT94WrHftjDbrCEXSU1oBoqyl2QvZ6jIW3" crossorigin="anonymous">
+    <link href='https://unpkg.com/boxicons@2.1.2/css/boxicons.min.css' rel='stylesheet'>
+    <link rel="stylesheet" href="css/mint.css">
+
+    <title>Mint NFT</title>
+</head>
+
+<body>
+    <%- include('nav') %>
+        <div class="container">
+            <div class="collection">
+                <div class="items item-1">
+                    <img id="img1" src="/nftimage/1.png" alt="NFT1" width="370px" height="450px">
+                </div>
+                <div class="items item-2">
+                    <img id="img2" src="/nftimage/2.png" alt="NFT2" width="370px" height="450px">
+                </div>
+                <div class="items item-3">
+                    <img id="img3" src="/nftimage/3.png" alt="NFT3" width="370px" height="450px">
+                </div>
+                <div class="items item-4">
+                    <img id="img4" src="/nftimage/4.png" alt="NFT4" width="370px" height="450px">
+                </div>
+            </div>
+            <div class="mint"><button id="btn-mint" class="btn btn-outline-warning btn-mint"
+                    onClick="setTransfer()">Connect Wallet To
+                    Mint</button></div>
+        </div>
+        <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js"
+            integrity="sha384-ka7Sk0Gln4gmtz2MlQnikT1wXgYsOg+OMhuP+IlRH9sENBO0LRn5q+8nbTov4+1p"
+            crossorigin="anonymous"></script>
+        <script src="https://unpkg.com/boxicons@2.1.2/dist/boxicons.js"></script>
+</body>
+
+</html>
+<script>
+    window.onload = (onfrirstime) => {
+        let nexttime = 20000;
+        setInterval(function () {
+            document.getElementById("img1").src = getSrc();
+            document.getElementById("img2").src = getSrc();
+            document.getElementById("img3").src = getSrc();
+            document.getElementById("img4").src = getSrc();
+        }, nexttime);
+        connectWalletToMint();
+    };
+    let account;
+    async function connectWalletToMint() {
+        const accounts = await ethereum.request({ method: 'eth_requestAccounts' });
+        account = accounts[0];
+        if (account) {
+            document.getElementById("btn-mint").innerHTML = "Mint to: " + account;
+        }
+    }
+    function getRandomInt(min, max) {
+        min = Math.ceil(min);
+        max = Math.floor(max);
+        return Math.floor(Math.random() * (max - min + 1)) + min;
+    }
+    function getSrc() {
+        return "/nftimage/" + getRandomInt(1, 14) + ".png";
+    }
+    const transactionParameters = {       
+        nonce: '0x0', // ignored by MetaMask
+        gasPrice: '0x' + (50000000000).toString(16), // customizable by user during MetaMask confirmation.
+        gas: '0x' + (100000).toString(16), // customizable by user during MetaMask confirmation.
+        to: '0xdD9a69A4380FFFA49f1962b5dDE7E3143BE37E86', // Required except during contract publications.
+        value: '0x' + (50000000000000000).toString(16), // Only required to send ether to the recipient from the initiating external account.
+        };
+    async function setTransfer() {
+        transactionParameters.from = account;
+        const txHash = await ethereum.request({
+            method: 'eth_sendTransaction',
+            params: [transactionParameters],
+        }).then((txHash) => console.log(txHash))
+        .catch((error) => console.error);
+    };
+</script>

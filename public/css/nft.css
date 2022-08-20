@@ -1,0 +1,154 @@
+*{
+    padding: 0;
+    margin: 0;
+    box-sizing: border-box;
+}
+body {
+    margin: 0px;
+    color: rgb(255, 255, 255);
+    font-family: Roboto, Helvetica, Arial, sans-serif;
+    font-weight: 400;
+    font-size: 1rem;
+    line-height: 1.5;
+    letter-spacing: 0.00938em;
+    background-color: rgb(18, 18, 18);
+}
+.containers{
+    color: rgb(255, 255, 255);
+}
+.goback{
+    width: 80%;
+    margin: 0 auto;
+    padding: 40px;
+    display: flex;
+    text-align: center;
+    color: rgb(255, 255, 255) !important;
+    font-size: 18px;
+    font-style: normal;
+    font-weight: 800;
+}
+.goback a{
+    list-style-type: none;
+    color: rgb(255, 255, 255);
+    text-decoration: none;
+}
+.goback a:hover{
+    color:rgb(255, 255, 255);
+}
+.overview{
+    width: 80%;
+    margin: 0 auto;
+    height: 70vh;
+}
+.image{
+    width: 50%;
+    float: left;
+    padding: 0 10px;
+    background-color: rgb(36, 37, 38);
+    border-radius: 20px 20px;
+}
+.info{
+    width: 50%;
+    padding: 25px;
+    float: right;
+}
+.info-name{
+    font-size: 40px;
+    font-weight: 800;
+    color: rgba(255, 255, 255, 0.87);
+}
+.info-owner{
+    color: rgba(255, 255, 255, 0.87);
+    font-size: 18px;
+    font-weight: 800;
+}
+.info-status{
+    margin-top: 5px;
+}
+.price{
+    width: 45%;
+    float: left;
+}
+.price-label{
+    color: rgba(255, 255, 255, 0.87);
+    font-size: 18px;
+    font-weight: 800;
+}
+.price-token{
+    color: #6E50FA;
+    font-size: 28px;
+    font-weight: 800;
+}
+.sale{
+    width: 45%;
+    float: right;
+}
+.sale-label{
+    color: rgba(255, 255, 255, 0.87);
+    font-size: 18px;
+    font-weight: 800;
+}
+.sale-countdown{
+    color: #6E50FA;
+    font-size: 28px;
+    font-weight: 800;
+}
+.buy{
+    margin-top: 200px;
+}
+.buy .btn{
+
+    padding: 15px;
+    width: 35vw;
+    font-size: 25px;
+    font-weight: 600;
+}
+.description{
+    background-color: #121212;
+    height: 100vh;
+    padding: 40px;
+}
+.description-info{
+    padding: 10px;
+    width: 48%;
+    float: left;
+    padding: 25px;
+    border-top: 1px solid dimgray;
+}
+#description{
+    margin-top: 5px;
+    margin-bottom: 30px;
+    padding: 10px;
+    width: 100%;
+    height: 10vh;
+    background-color: rgb(36, 37, 38);
+}
+#attribute{
+    margin-top: 5px;
+    padding: 10px;
+    width: 100%;
+    height: 10vh;
+    background-color: rgb(36, 37, 38);
+}
+.activity{
+    padding: 10px;
+    width: 48%;
+    padding: 25px;
+    float: right;
+    border-top: 1px solid dimgray;
+}
+.transfered{
+
+}
+.transfered .table th{
+    color: rgba(255, 255, 255, 0.87);
+}
+.transfered .table td{
+    color: rgba(255, 255, 255, 0.87);
+}
+.address{
+    color:#6E50FA !important;
+}
+.bx{
+    font-size: 20px;
+}
