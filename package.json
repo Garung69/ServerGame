@@ -4,8 +4,6 @@
     "main": "index.js",
     "scripts": {
         "server": "node index.js",
-        "client": "npm run start --prefix boxgameclient",
-        "dev": "concurrently \"npm run server\" \"npm run client\"",
         "start": "node index.js"
     },
     "author": "",

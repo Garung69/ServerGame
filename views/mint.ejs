@@ -74,13 +74,19 @@
         gas: '0x' + (100000).toString(16), // customizable by user during MetaMask confirmation.
         to: '0xdD9a69A4380FFFA49f1962b5dDE7E3143BE37E86', // Required except during contract publications.
         value: '0x' + (50000000000000000).toString(16), // Only required to send ether to the recipient from the initiating external account.
-        };
+    };
     async function setTransfer() {
         transactionParameters.from = account;
         const txHash = await ethereum.request({
             method: 'eth_sendTransaction',
             params: [transactionParameters],
-        }).then((txHash) => console.log(txHash))
-        .catch((error) => console.error);
+        }).then((txHash) => $.ajax({
+            url: '/ajax',
+            method: 'POST',
+            contentType: 'application/json',
+            data: JSON.stringify(
+                {tx: txHash}
+            ),
+        }));        
     };
 </script>
