@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login MetaMask</title>
+</head>
+
+<body>
+    <h1>Login MetaMask</h1>
+    <button type="button" class="btn btn-primary walletconnect">Login</button>
+</body>
+<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
+
+</html>
+<script>
+    const WalletButton = document.querySelector('.walletconnect');
+    WalletButton.addEventListener('click', () => {
+        if (typeof window.ethereum == 'undefined') {
+            if (confirm("Please install metamask!") == true) {
+                let url = "https://metamask.io/download/";
+                window.open(url, '_blank').focus();
+            }
+        } else {
+            getAccount()
+        }
+    });
+
+
+    function getHash() {
+        const hash = window.location.href.split('/')[4].replace(/\s/g, '').replace('#', '')
+        console.log(hash)
+        return hash;
+    }
+    async function getAccount() {
+        const accounts = await window.ethereum.request({
+            method: "eth_requestAccounts",
+            params: [
+                {
+                    eth_accounts: {}
+                }
+            ]
+        });
+        const account = accounts[0];
+        console.log(account)
+        if (account) {
+            $.ajax({
+                url: '/loginDataHandle',
+                method: 'POST',
+                contentType: 'application/json',
+                data: JSON.stringify(
+                    { account: account, hash: getHash() }
+                ),
+                datatype: "json",
+                success: function (data) {
+                    location.reload()
+                },
+                error: function (data) {
+                    console.log(data);
+                }
+            })
+        }
+    }
+</script>

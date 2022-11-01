@@ -94,7 +94,7 @@ body {
     font-weight: 800;
 }
 .buy{
-    margin-top: 200px;
+    margin-top: 170px;
 }
 .buy .btn{
 
@@ -151,4 +151,82 @@ body {
 }
 .bx{
     font-size: 20px;
+}
+.popup {
+    margin: 0 auto;
+    
+    position: relative;
+    cursor: pointer;
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+}
+
+
+.popup .popupimage {
+    width: 300px;
+    height: 450px;
+    margin-top: 50px;
+    visibility: visible;
+    color: #fff;
+    background-color: dimgrey;
+    border-radius: 6px;
+    padding: 8px 0;
+    transform: translate(75%, -20%);
+    position: absolute;
+    z-index: 1;
+}
+.popup .popuptext {
+    top: 0;
+    text-align: center;
+}
+.popuptext span {
+    color: aqua;
+    font-size: 20px;
+    font-weight: 600;
+}
+
+
+.popup .show {
+    visibility: visible;
+    -webkit-animation: fadeIn 1s;
+    animation: fadeIn 1s;
+}
+.inputPrice{
+    max-width: 75%;
+    float: left;
+}
+.chainImage{
+    float: right;
+    margin-right: 90px;
+}
+.cancelbtn{
+    max-width: 23%;
+    margin-left: 1%;
+}
+.sellbtn{
+    max-width: 75%;
+}
+.setPrice{
+    display: none;
+}
+.isSale{
+    display: none;
+}
+.is-Sale{
+    display: none;
+}
+.delist{
+    display: none;
+}
+.confirm-delist{
+    max-width: 75%;
+}
+.cancel-delist{
+    max-width: 23%;
+    margin-left: 1%;
+}
+.price-label-warning{
+    color: red;
 }

@@ -24,6 +24,7 @@ body {
     margin: 5px 35px;
     position: relative;
 }
+
 /* .items :hover{
     transform: translate(-20%, -16%);
 } */
@@ -101,11 +102,52 @@ body {
         transform: translateX(-2000px);
     }
 }
+
 .mint {
     text-align: center;
     margin-top: 80px;
     z-index: 5;
 }
-.mint .btn{
+
+.mint .btn {
     color: #fff;
+}
+
+.popup {
+    margin: 0 auto;
+    width: 100%;
+    position: relative;
+    cursor: pointer;
+    -webkit-user-select: none;
+    -moz-user-select: none;
+    -ms-user-select: none;
+    user-select: none;
+}
+
+
+.popup .popupimage {
+    visibility: hidden;
+    color: #fff;
+    background-color: dimgrey;
+    border-radius: 6px;
+    padding: 8px 0;
+    transform: translate(75%, -20%);
+    position: absolute;
+    z-index: 1;
+}
+.popup .popuptext {
+    top: 0;
+    text-align: center;
+}
+.popuptext span {
+    color: red;
+    font-size: 20px;
+    font-weight: 600;
+}
+
+
+.popup .show {
+    visibility: visible;
+    -webkit-animation: fadeIn 1s;
+    animation: fadeIn 1s;
 }

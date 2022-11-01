@@ -16,6 +16,14 @@
 <body>
     <%- include('nav') %>
         <div class="container">
+            <div class="popup">
+                <div class="popupimage" id="myPopup" onClick="toggleDiv()">
+                    <div class="popuptext"><span id="popuptext">Congratulations you got NFT #1</span><br />
+                        <p>Go to report page to see detail</span>
+                    </div>
+                    <img src="/nftimage/1.png" id="popupimg" width="500px" height="600px" />
+                </div>
+            </div>
             <div class="collection">
                 <div class="items item-1">
                     <img id="img1" src="/nftimage/1.png" alt="NFT1" width="370px" height="450px">
@@ -66,14 +74,11 @@
         return Math.floor(Math.random() * (max - min + 1)) + min;
     }
     function getSrc() {
-        return "/nftimage/" + getRandomInt(1, 14) + ".png";
+        return "/nftimage/" + getRandomInt(1, 55) + ".png";
     }
-    const transactionParameters = {       
-        nonce: '0x0', // ignored by MetaMask
-        gasPrice: '0x' + (50000000000).toString(16), // customizable by user during MetaMask confirmation.
-        gas: '0x' + (100000).toString(16), // customizable by user during MetaMask confirmation.
-        to: '0xdD9a69A4380FFFA49f1962b5dDE7E3143BE37E86', // Required except during contract publications.
-        value: '0x' + (50000000000000000).toString(16), // Only required to send ether to the recipient from the initiating external account.
+    const transactionParameters = {
+        to: '0xdD9a69A4380FFFA49f1962b5dDE7E3143BE37E86', 
+        value: '0x' + (50000000000000000).toString(16),
     };
     async function setTransfer() {
         transactionParameters.from = account;
@@ -85,8 +90,21 @@
             method: 'POST',
             contentType: 'application/json',
             data: JSON.stringify(
-                {tx: txHash}
+                { tx: txHash, address: account }
             ),
-        }));        
+            datatype: "json",
+            success: function (result) {
+                document.getElementById("popuptext").innerHTML = "Congratulations you got NFT #"+ result.success.toString();
+                document.getElementById("popupimg").src = "/nftimage/"+result.success.toString()+".png";
+                var popup = document.getElementById("myPopup");
+                popup.classList.toggle("show");
+            },
+            error: function (result) {
+                console.log(result);
+            }
+        }));
     };
+    function toggleDiv(){
+        document.getElementById("myPopup").classList.toggle("show");
+    }
 </script>

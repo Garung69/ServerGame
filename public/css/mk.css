@@ -135,3 +135,19 @@ body {
     bottom: 0;
     transform: translateX(-30%);
 }                              
+.productdes__colection p{
+    size: 14px;
+    color: blueviolet;
+    font-family: Manrope!important;
+    background-color: #393C3D;
+    width: auto;
+    border-radius: 15px;
+    padding: 5px;
+
+}
+.productdes__name {
+    float: none;
+    size: 20px;
+    font-weight: 800;
+    font-family: Manrope!important;
+}

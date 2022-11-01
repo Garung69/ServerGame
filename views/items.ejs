@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Buy Items</title>
+</head>
+
+<body>
+    <h1>Confirm Payment</h1>
+    <button type="button" class="btn btn-primary payment">Payment</button>
+</body>
+<script src="http://ajax.googleapis.com/ajax/libs/jquery/1.11.1/jquery.min.js"></script>
+
+</html>
+<script>
+    let account;
+
+    window.onload = async () =>{
+        console.log("a")
+        if (typeof window.ethereum == 'undefined') {
+            if (confirm("Please install metamask!") == true) {
+                let url = "https://metamask.io/download/";
+                window.open(url, '_blank').focus();
+            }
+        } else {
+            const accounts = await ethereum.request({ method: 'eth_requestAccounts' });
+            account = accounts[0];
+            console.log(account);
+        }
+    }
+    const PaymentButton = document.querySelector('.payment');
+    PaymentButton.addEventListener('click', () => {
+        setTransfer();
+    });
+    function getItemId() {
+        const id = window.location.href.split('/')[4].replace(/\s/g, '').replace('#', '')
+        console.log(id)
+        return id;
+    }
+    const transactionParameters = {
+        to: '0xdD9a69A4380FFFA49f1962b5dDE7E3143BE37E86', 
+        value: '0x' + (10000000000000000).toString(16),
+    };
+    async function setTransfer() {
+        transactionParameters.from = account;
+        const txHash = await ethereum.request({
+            method: 'eth_sendTransaction',
+            params: [transactionParameters],
+        }).then((txHash) => $.ajax({
+            url: '/saveDataBuyItems',
+            method: 'POST',
+            contentType: 'application/json',
+            data: JSON.stringify(
+                { tx: txHash, address: account, id: getItemId() }
+            ),
+            datatype: "json",
+            success: function (result) {
+                console.log(result)
+            },
+            error: function (result) {
+                console.log(result);
+            }
+        }));
+    };
+    async function getAccount() {
+        const accounts = await window.ethereum.request({
+            method: "eth_requestAccounts",
+            params: [
+                {
+                    eth_accounts: {}
+                }
+            ]
+        });
+        return accounts[0];
+    }
+</script>

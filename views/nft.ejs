@@ -8,7 +8,7 @@
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/css/bootstrap.min.css" rel="stylesheet"
         integrity="sha384-1BmE4kWBq78iYhFldvKuhfTAU6auU8tT94WrHftjDbrCEXSU1oBoqyl2QvZ6jIW3" crossorigin="anonymous">
     <link href='https://unpkg.com/boxicons@2.1.2/css/boxicons.min.css' rel='stylesheet'>
-    <link rel="stylesheet" href="css/nft.css">
+    <link rel="stylesheet" href="/css/nft.css">
     <title>NFT</title>
 </head>
 
@@ -19,21 +19,61 @@
                 <a href="/mk"><i class='bx bx-arrow-back' style='color:#ffffff'></i> Back to Previous</a>
             </div>
             <div class="overview">
-                <div class="image"> <img src="/nftimage/2.png" width="550" height="450" alt="" /></div>
+                <div class="image"> <img src="<%=nft._nftImage%>" width="550" height="450" alt="" /></div>
                 <div class="info">
-                    <div class="info-name">NFT for Test #12</div>
-                    <div class="info-owner">Owner by: 0x9406233...48845BD</div>
+                    <div class="info-name" id="info-name">NFT for Test #<%=nft._nftId%>
+                    </div>
+                    <div class="info-owner" id="info-owner">Owner by: <%=nft._nftOwner%>
+                    </div>
                     <div class="info-status">
                         <div class="price">
                             <div class="price-label">Current Price</div>
-                            <div class="price-token">20.0 USDT</div>
+                            <div class="price-token" id="price-token">
+                                <%=nft._nftPrice%>
+                            </div>
                         </div>
                         <div class="sale">
                             <div class="sale-label">Sale end in</div>
-                            <div class="sale-countdown">972 Hours</div>
+                            <div class="sale-countdown" id="sale-countdown">
+                                <%=nft._saleTime%>
+                            </div>
                         </div>
                     </div>
-                    <div class="buy"><button class="btn btn-primary">Offer this items</button></div>
+                    <div class="buy">
+                        <div class="isSale" id="isSale">
+                            <button class="btn btn-warning" id="cancel-listing"
+                                onclick="toggleDisplay('cancel-listing','delist')">Delist this items</button>
+                            <div class="delist" id="delist">
+                                <div class="price-label price-label-warning ">Are you sure to Delist this items?</div>
+                                <button class="btn btn-warning confirm-delist" id="confirm-delist" onclick="delist()">Confirm
+                                    Delist</button><button class="btn btn-danger cancel-delist" id="cancel-delist"
+                                    onclick="toggleDisplay('cancel-listing','delist')">Cancel</button>
+                            </div>
+                        </div>
+                        <div class="isNotSale" id="isNotSale">
+                            <% if (nft._isSale) {%>
+                                <button class="btn btn-primary" type="button " onClick="saleNFT()"
+                                id="buy">Buy this
+                                Items</button>
+                            <%} else {%>
+                                <button class="btn btn-primary" type="button " onClick="toggleDisplay('buy','setPrice')"
+                                id="buy">Offer this
+                                Items</button>
+                                <%}%>
+                            <div class="setPrice" id="setPrice">
+                                <div class="price-label">Set Price</div>
+                                <input type="text" class="form-control inputPrice" id="inputPrice"
+                                    placeholder="Input price (Only number and must be Geater than 0)">
+                                <img src="https://opensea.io/static/images/logos/bsc.png" class="chainImage" size="24">
+                                <button class="btn btn-primary sellbtn" type="button" onClick="saleNFT()"
+                                    id="sellbtn">Sell</button><button class="btn btn-danger cancelbtn" type="button"
+                                    id="cancelbtn" onClick="toggleDisplay('buy','setPrice')">Cancel</button>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="is-Sale" id="is-Sale">
+                        <%=nft._isSale%>
+                    </div>
                 </div>
             </div>
             <div class="description">
@@ -79,3 +119,167 @@
 </body>
 
 </html>
+<script>
+    let account;
+    window.onload = async (onfrirstime) => {
+        account = await getAccount();
+        let a = account.replace(/\s/g, '')
+        let b = document.getElementById("info-owner").innerHTML.toString().split(' ')[2].toString().replace(/\s/g, '');
+        if (a == b) {
+            const salebtn = document.getElementById("buy").innerHTML = "Sale this Items";
+            checkIsSale()
+        }
+        timeConvert()
+    }
+
+    async function getAccount() {
+        const accounts = await ethereum.request({ method: 'eth_requestAccounts' });
+        return accounts[0]
+    }
+
+    async function saleNFT() {
+        console.log("sale NFT function")
+        if (document.getElementById("buy").innerHTML.toString() == "Sale this Items") {
+            if (validateTransaction()) {
+                const id = parseInt(document.getElementById("info-name").innerHTML.toString().split(' ')[3].split('#')[1])
+                var price = document.getElementById("inputPrice").value;
+                $.ajax({
+                    url: '/encode',
+                    method: 'POST',
+                    contentType: 'application/json',
+                    data: JSON.stringify(
+                        { tokenId: id }
+                    ),
+                    datatype: "json",
+                    success: async function (result) {
+                        console.log(result.success);
+                        const transactionParameters = {
+                            nonce: '0x0',
+                            gasPrice: '0x' + (200000000000).toString(16),
+                            gas: '0x' + (200000).toString(16),
+                            to: '0xc506885bb49f03F77418Ba0ae10EB5ED3CE16037',
+                            data: result.success
+                        };
+                        transactionParameters.from = account;
+                        const txHash = await ethereum.request({
+                            method: 'eth_sendTransaction',
+                            params: [transactionParameters],
+                        }).then((txHash) => {
+                            $.ajax({
+                                url: '/approved',
+                                method: 'POST',
+                                contentType: 'application/json',
+                                data: JSON.stringify(
+                                    { address: account, id: id, price: price }
+                                ),
+                                datatype: "json",
+                                success: function (data) {
+                                    location.reload()
+                                },
+                                error: function (data) {
+                                    console.log(data);
+                                }
+                            })
+                        })
+                    },
+                    error: function (result) {
+                        console.log(result);
+                    }
+                })
+            }
+        }
+        if(document.getElementById("buy").innerHTML.toString().replace(/\s/g, '') == "BuythisItems"){
+            const price = parseFloat(document.getElementById("price-token").innerHTML.toString().replace(/\s/g, '').split('BNB')[0])
+            const id = parseInt(document.getElementById("info-name").innerHTML.toString().split(' ')[3].split('#')[1])
+            const transactionParameters = {           
+                to: document.getElementById("info-owner").innerHTML.toString().split(' ')[2].toString().replace(/\s/g, ''),
+                value: '0x' + (price * 1000000000000000000).toString(16),
+            };
+            transactionParameters.from = account;
+            const txHash = await ethereum.request({
+                method: 'eth_sendTransaction',
+                params: [transactionParameters],
+            }).then((txHash) => {
+                $.ajax({
+                    url: '/buyNFT',
+                    method: 'POST',
+                    contentType: 'application/json',
+                    data: JSON.stringify(
+                        { address: account, id: id}
+                    ),
+                    datatype: "json",
+                    success: function (data) {
+                        location.reload()
+                    },
+                    error: function (data) {
+                        console.log(data);
+                    }
+                })
+            })
+        }
+    }
+    function delist() {
+        const id = parseInt(document.getElementById("info-name").innerHTML.toString().split(' ')[3].split('#')[1])
+        $.ajax({
+            url: '/delist',
+            method: 'POST',
+            contentType: 'application/json',
+            data: JSON.stringify(
+                {id: id}
+            ),
+            datatype: "json",
+            success: function (data) {
+                location.reload()
+            },
+            error: function (data) {
+                console.log(data);
+            }
+        })
+    }
+    function checkIsSale() {
+        var x = document.getElementById("is-Sale").innerHTML.replace(/\s/g, '')
+        console.log(x)
+        if (x == "true") {
+            var y = document.getElementById("isSale")
+            var z = document.getElementById("isNotSale")
+            y.style.display = "block"
+            z.style.display = "none"
+        }
+    }
+    function validateTransaction() {
+        var x = document.getElementById("inputPrice").value;
+        if (x == '' || x == null) {
+            alert('Please input price')
+            return false;
+        }
+        x = parseInt(x)
+        if (isNaN(x)) {
+            alert('Please input a number')
+            return false;
+        }
+        if (x < 0) {
+            alert('Please input a number Geater than 0')
+            return false;
+        }
+        return true;
+    }
+    function timeConvert() {
+        var x = document.getElementById("sale-countdown").innerHTML;
+        x = parseInt(x)
+        var y = x + 604800000
+        document.getElementById("sale-countdown").innerHTML = Math.floor((y - Date.now()) / 86400000) + " days left"
+    }
+    function toggleDisplay(a, b) {
+        console.log(a)
+        console.log(b)
+        var x = document.getElementById(a.toString())
+        var y = document.getElementById(b.toString())
+        if (y.style.display == "none") {
+            x.style.display = "none";
+            y.style.display = "block";
+        } else {
+            x.style.display = "inline-block";
+            y.style.display = "none";
+        }
+    }
+</script>

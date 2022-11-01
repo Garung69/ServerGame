@@ -1,8 +1,25 @@
+const { MongoClient, ObjectId, Double } = require('mongodb');
+
+const URL = 'mongodb+srv://thien:tavip123@gameboxdb.rxhaxzg.mongodb.net/test';
+const DATABASE_NAME = "boxgamedatabase"
+
+async function getDB() {
+    const client = await MongoClient.connect(URL);
+    const dbo = client.db(DATABASE_NAME);
+    return dbo;
+}
+
+
+
 var express = require('express');
 const Web3 = require('web3')
-const Abi = require('./abi.json');
+const Abi = require('./nftabi.json');
+const { initScheduledJobs } = require('./scheduledFunctions/distributeToken')
+const { calPoint, getPaymentUnityData, savePaymentData, getLoginUnityData,afterTransferNFT, currentOwner, test, asPromise, saveUnityLoginData, setDelist, getAllGame, seedNft, getAllNft, delAllNFT, getNFTDetails, afterMintNFT, requestMintNFT, setApprove } = require('./function');
 const tokenReceiverForMint = "0xdD9a69A4380FFFA49f1962b5dDE7E3143BE37E86";
 const privateKey = "d6181c28b8c41da16ef1eed12d7430abd5e9d76b6e72356cbedccbde4787dab4";
+const provider = 'https://data-seed-prebsc-1-s1.binance.org:8545/'
+const contractAddress = "0xc506885bb49f03F77418Ba0ae10EB5ED3CE16037"
 var app = express();
 app.set('view engine', 'ejs');
 app.set("views", "./views");
@@ -18,18 +35,66 @@ var server = require("http").Server(app);
 const port = process.env.PORT || 5000;
 server.listen(port);
 
-app.get('/api/helloworld', (req, res) => {
-    res.json({ sayHi: 'hello from server, nice to meet you!' })
+initScheduledJobs();
+
+app.post('/loginDataHandle', async (req, res) => {
+    await saveUnityLoginData(req.body.account, req.body.hash)
+})
+
+app.post('/loginUnityHandle', async (req, res) => {
+    console.log(req.body.hash);
+    const result = await getLoginUnityData(req.body.hash, 6)
+    res.json(result);
+})
+
+app.get('/loginUnity/:id', async (req, res) => {
+    res.render("login");
+})
+
+
+app.post('/saveDataBuyItems', async (req, res) => {
+    console.log(req.body.address+ " : " +req.body.id);
+    await savePaymentData(req.body.address, req.body.id );
+    res.json(req.body.id);
+})
+
+app.post('/getDataBuyItems', async (req, res) => {
+    console.log("Requset from unity: "+req.body.address);
+    const result = await getPaymentUnityData(req.body.address, 6)
+    res.json(result);
+})
+
+app.get('/buyItems/:id', async (req, res) => {
+    res.render("items");
+})
+
+
+app.post('/addpoint', async (req, res) => {
+    return "false";
+})
+
+app.get('/apitest', async (req, res) => {
+    const allGames = await calPoint();
+    res.json(allGames);
+})
+
+app.get('/delnft', async (req, res) => {
+    await delAllNFT();
+    res.json({ text: "done" });
+})
+
+app.get('/seednft', async (req, res) => {
+    const seednft = await seedNft();
+    const result = await getAllNft();
+    res.json(result);
 })
 app.get('/apiformint/:id', (req, res) => {
-    if(req.params.id == 1){
+    if (req.params.id == 1) {
         res.json({ Mintable: false })
-    }else{
+    } else {
         res.json({ Mintable: true })
     }
 })
-
-
 app.get('/', function (req, res) {
     res.render("home");
 })
@@ -42,14 +107,18 @@ app.post('/mint', async function (req, res) {
     console.log("result");
 })
 
-app.get('/mk', function (req, res) {
-    res.render("marketplace");
+app.get('/mk', async function (req, res) {
+    const allNFT = await getAllNft();
+    res.render("marketplace", { nfts: allNFT });
+    //res.json({ nfts: allNFT })
 })
 app.get('/rp', function (req, res) {
     res.render("report");
 })
-app.get('/nft', function (req, res) {
-    res.render("nft");
+app.get('/nft:id', async function (req, res) {
+    console.log(req.params.id);
+    const nft = await getNFTDetails(req.params.id);
+    res.render("nft", { nft: nft });
 })
 app.get('/nftdetail/:id', function (req, res) {
     res.end(JSON.stringify((
@@ -62,27 +131,98 @@ app.get('/nftdetail/:id', function (req, res) {
 })
 
 app.post('/ajax', async function (req, res) {
-    const web3 = new Web3(new Web3.providers.HttpProvider('https://data-seed-prebsc-1-s1.binance.org:8545/'))
+    const web3 = new Web3(new Web3.providers.HttpProvider(provider))
     result = await web3.eth.getTransaction(req.body.tx);
     if (result.to == tokenReceiverForMint && (result.value / (10 ** 18)) == 0.05) {
-        const contract = await new web3.eth.Contract(Abi, "0x1781D198eB4a184F3243932Ba81B0113e09C699E");
-        mintToken();
-        // const result2 = await contract.methods.transfer("0xdD9a69A4380FFFA49f1962b5dDE7E3143BE37E86", 25000).send();
-        // console.log(result2);
+        const couter = await requestMintNFT("boxgame");
+        await mintToken(couter);
+        res.json({ success: couter, status: 200 });
     }
-    async function mintToken() {
-        const contract = await new web3.eth.Contract(Abi, "0x1781D198eB4a184F3243932Ba81B0113e09C699E");
+    async function mintToken(id) {
+        const contract = await new web3.eth.Contract(Abi, contractAddress);
         const tx = {
-            from: "0x9406233681465c9238f332bb3dbeBD6E048845BD",
-            to: "0x1781D198eB4a184F3243932Ba81B0113e09C699E",
-            nonce: '0x0',
-            gas: '0x' + (100000).toString(16),
-            gasPrice: '0x' + (50000000000).toString(16),
-            data: contract.methods.transfer("0xdD9a69A4380FFFA49f1962b5dDE7E3143BE37E86", 25000).encodeABI()
+            to: contractAddress,
+            gas: '0x' + (200000).toString(16),
+            gasPrice: '0x' + (80000000000).toString(16),
+            chainId: '97',
+            data: contract.methods.mintNew(req.body.address, id).encodeABI()
         };
-        const signPromise = web3.eth.accounts.signTransaction(tx, privateKey);
+        console.log(tx.data);
+        const signPromise = await web3.eth.accounts.signTransaction(tx, privateKey);
         const receipt = await web3.eth.sendSignedTransaction(signPromise.rawTransaction);
         console.log(receipt);
+        afterMintNFT(id, req.body.address);
     }
+})
 
+app.post('/encode', async (req, res) => {
+
+    const web3 = new Web3(new Web3.providers.HttpProvider(provider))
+    console.log(web3.version)
+    const contract = await new web3.eth.Contract(Abi, contractAddress);
+    const encode = contract.methods.approve("0x9406233681465c9238f332bb3dbeBD6E048845BD", req.body.tokenId).encodeABI().toString()
+    console.log("encode: " + encode)
+    res.json({ success: encode });
+})
+
+app.post('/approved', async (req, res) => {
+    await setApprove(req.body.address, req.body.id, req.body.price);
+    res.json({ success: true });
+})
+app.post('/delist', async (req, res) => {
+    await setDelist(req.body.id);
+    res.json({ success: true });
+})
+
+app.post('/buyNFT', async function (req, res) {
+    const web3 = new Web3(new Web3.providers.HttpProvider(provider))
+        console.log("function buy NFT")
+        await transferToken();
+        res.json({ success: true , status: 200 });
+
+    async function transferToken() {       
+        console.log("Function transfer token")
+        const contract = await new web3.eth.Contract(Abi, contractAddress);
+        const tx = {
+            to: contractAddress,
+            chainId: '97',
+            data: contract.methods.safeTransferFrom(await currentOwner(req.body.id), req.body.address, req.body.id).encodeABI()
+        };
+        const signPromise = await web3.eth.accounts.signTransaction(tx, privateKey);
+        const receipt = await web3.eth.sendSignedTransaction(signPromise.rawTransaction);
+        console.log(receipt);
+        await afterTransferNFT(req.body.id, req.body.address);
+    }
+})
+
+app.post('/sendPayLoad', (req,res)=>{
+    let response = ''
+    try {
+        const payLoad = req.body.jsonpayload
+        console.log(payLoad)
+        const jsonObjec = JSON.parse(payLoad)
+        
+        console.log(jsonObjec.userId)
+        console.log(jsonObjec.detailList.length)
+        let names = ''
+        jsonObjec.detailList.forEach(element => {
+            names += element.name + ","
+        });
+        names = names.substring(0,names.length -1) // remove the last ","
+        console.log(jsonObjec.detailList[0].name)
+        response = {
+            'uploadResponseCode' :'SUCCESS',
+            'userid' : jsonObjec.userId,
+            'number': jsonObjec.detailList.length,
+            'names' : names,
+            'message':'successful upload – all done!'
+
+        }
+    } catch (error) {
+        response = {
+            'uploadResponseCode' :'ERROR',
+            'message':'your request is invalid! check the request format!'
+        }
+    }    
+    res.json(response)
 })
