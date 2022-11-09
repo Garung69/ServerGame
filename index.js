@@ -32,8 +32,7 @@ app.use(bodyPaser.urlencoded({ extended: true }));
 var server = require("http").Server(app);
 // var io = require("socket.io")(server);
 // app.io = io;
-const port = process.env.PORT || 5000;
-server.listen(port);
+server.listen(process.env.PORT || 5000);
 
 initScheduledJobs();
 
