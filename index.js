@@ -101,6 +101,8 @@ app.get('/apiformint/:id', (req, res) => {
     }
 })
 app.get('/', function (req, res) {
+    const web3 = new Web3(new Web3.providers.HttpProvider(provider))
+    console.log(web3.version)
     res.render("home");
 })
 
