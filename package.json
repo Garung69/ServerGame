@@ -1,7 +1,7 @@
 {
     "name": "a",
     "version": "1.0.0",
-    "main": "index.js",
+    "main": "lib/functions/src/index.js",
     "scripts": {
         "server": "node index.js",
         "start": "node index.js"
