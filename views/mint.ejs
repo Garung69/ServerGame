@@ -65,6 +65,10 @@
         const accounts = await ethereum.request({ method: 'eth_requestAccounts' });
         account = accounts[0];
         if (account) {
+            const showAccount = document.querySelector('.showAccount');
+            document.getElementById("btn-connect").innerHTML = "";
+            const account = accounts[0];
+            showAccount.innerHTML = account;
             document.getElementById("btn-mint").innerHTML = "Mint to: " + account;
         }
     }

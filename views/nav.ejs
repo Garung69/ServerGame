@@ -3,7 +3,7 @@
 <link href='https://unpkg.com/boxicons@2.1.2/css/boxicons.min.css' rel='stylesheet'>
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
 
-<link rel="stylesheet" href="css/home.css">
+<link rel="stylesheet" href="css/nav.css">
 <div class="nav">
     <div class="logoheader"><img src="/res/img/logoHeader.png" width="120px" height="70px" alt="logoheader" /></div>
     <div class="navli" id="nav3">
@@ -24,6 +24,9 @@
 <script src="https://unpkg.com/boxicons@2.1.2/dist/boxicons.js"></script>
 
 <script>
+    window.onload = function() {
+        getAccount();
+    }
     const WalletButton = document.querySelector('.walletconnect');
     const showAccount = document.querySelector('.showAccount');
     WalletButton.addEventListener('click', () => {

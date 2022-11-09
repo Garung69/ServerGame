@@ -92,6 +92,7 @@ async function setApprove(address, id, price) {
         await db.collection('approve').insertOne(newApprove);
     }
     await db.collection("nft").updateOne({ _nftId: id }, { $set: { _nftPrice: price + " BNB", _isSale: true, _saleTime: Date.now() } })
+    await saveActivityData(0, address, null, price, id, null);
 }
 
 function checkExists(a, array) {
@@ -146,7 +147,7 @@ async function saveUnityLoginData(address, hash) {
     }
 }
 
-async function savePaymentData(address, id) {
+async function saveUnityPaymentData(address, id) {
     db = await getDB();
     const result = await db.collection("paymentUnity").findOne({ _address: address })
     if (result) {
@@ -247,9 +248,98 @@ async function getLoginUnityData(hash, callbackTimes) {
     }  
 }
 
-async function SavePoint(data){
-    
+async function saveActivityData(type, addressFrom, addressTo, price, nftId, data){
+    //  type = 1 (tranfer) 
+    //  type = 0 (set price)
+    const db = await getDB();
+    if(type == 1){ 
+        console.log("saveType = 1")
+        const addressBuy = addressTo.slice(0, -30) + "...";
+        const addressSell = addressFrom.slice(0, -30) + "...";
+        const SellPrice = price + "BNB";
+        const link = "https://testnet.bscscan.com/tx/"+data;
+        const newData = { _type: 1, _addressFrom: addressSell, _addressTo: addressBuy, _nftId: nftId, _price: SellPrice, _link: link, _time: Date.now() }
+        await db.collection("activity").insertOne(newData)
+    }else{
+        const address = addressFrom.slice(0, -4) + "...";
+        const SellPrice = price + "BNB";
+        const link = "http://localhost:5000/nft"+nftId;
+        const newData = { _type: 0, _addressFrom: address, _nftId: nftId, _price: SellPrice, _link: link, _time: Date.now() }
+        await db.collection("activity").insertOne(newData)
+    }
 }
+
+async function savePaymentData( Address, Point, Token, data){
+    const timeElapsed = Date.now();
+    const today = new Date(timeElapsed);
+    const date = today.toLocaleDateString();
+    const address = Address.slice(0, -30) + "...";
+    const pointEarn = Point + " rp";
+    const tokenDistributed = Token + " TTBT";
+    const link = "https://testnet.bscscan.com/tx/"+data;
+    const newData = { _date: date, _address: address, _fullAddress: Address, _point: pointEarn, _token: tokenDistributed, _link: link , _time: Date.now()}
+    await db.collection("payment").insertOne(newData)
+}
+
+async function GetPaymentData(address){
+    findingAddress = address;
+    db = await getDB();
+    const data = await db.collection('payment').find({_fullAddress: findingAddress}).sort({_time: -1}).toArray();
+    return data;
+}
+
+async function GetProfileData(address){
+    findingAddress = address;
+    db = await getDB();
+    let totalPoint = 0;
+    let totalToken = 0;
+    let totalNFt = 0;
+    const payment = await db.collection('payment').find({_fullAddress: findingAddress}).toArray();
+    const nft = await db.collection('nft').find({_nftOwner: findingAddress}).toArray();
+    totalNFt = nft.length;
+    if(payment.length > 0){
+        for(let i = 0; i < payment.length; i++){
+            totalPoint = Number(totalPoint) + Number(payment[i]._point);
+            totalToken = Number(totalToken) + Number(payment[i]._token);
+        }
+    }
+    const data = {SubAddress: address.slice(0, -25)+"..." , Address: address, Nft: totalNFt, Point: totalPoint, Token: totalToken}
+    return data;
+}
+
+async function SavePoint(address, point){
+    db = await getDB();
+    const data  =  await GetNFTidByAddress(address);
+    if(data){
+        let TotalPoint = point;
+        data.forEach(async index => {
+            if(index._nftPoint < 200){
+                const maxPointToAdd = 200 - index._nftPoint;
+                if(maxPointToAdd < TotalPoint){
+                    await db.collection("nft").updateOne({ _nftId: index._nftId}, {$set: {_nftPoint: maxPointToAdd}})
+                    TotalPoint = TotalPoint - maxPointToAdd;
+                }else{
+                    await db.collection("nft").updateOne({ _nftId: index._nftId}, {$set: {_nftPoint: TotalPoint}})
+                    return 1;
+                }
+            }
+        });
+        return 1;
+    }
+    return 0;    
+}
+async function GetNFTidByAddress(address){
+    db = await getDB();
+    const data = await db.collection('nft').find({_nftOwner: address}).toArray();
+    return data;
+}
+
+async function GetActivityData(){
+    db = await getDB();
+    const data = await db.collection('activity').find({}).sort({_time: -1}).toArray();
+    return data;
+}
+
 
 async function currentOwner(id){
     db = await getDB();
@@ -267,4 +357,4 @@ async function afterTransferNFT(id, address){
 }
 
 
-module.exports = {savePaymentData, getPaymentUnityData, afterTransferNFT, currentOwner, asPromise, getLoginUnityData, saveUnityLoginData, setDelist, resetPoint, calPoint, getAllGame, seedNft, getAllNft, delAllNFT, getNFTDetails, afterMintNFT, requestMintNFT, setApprove }
+module.exports = {GetPaymentData,GetProfileData, savePaymentData, GetActivityData, saveActivityData, saveUnityPaymentData, SavePoint, getPaymentUnityData, afterTransferNFT, currentOwner, asPromise, getLoginUnityData, saveUnityLoginData, setDelist, resetPoint, calPoint, getAllGame, seedNft, getAllNft, delAllNFT, getNFTDetails, afterMintNFT, requestMintNFT, setApprove }

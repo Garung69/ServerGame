@@ -15,7 +15,7 @@ var express = require('express');
 const Web3 = require('web3')
 const Abi = require('./nftabi.json');
 const { initScheduledJobs } = require('./scheduledFunctions/distributeToken')
-const { calPoint, getPaymentUnityData, savePaymentData, getLoginUnityData,afterTransferNFT, currentOwner, test, asPromise, saveUnityLoginData, setDelist, getAllGame, seedNft, getAllNft, delAllNFT, getNFTDetails, afterMintNFT, requestMintNFT, setApprove } = require('./function');
+const {GetPaymentData, GetProfileData, calPoint, SavePoint, GetActivityData, getPaymentUnityData, saveUnityPaymentData,saveActivityData, getLoginUnityData,afterTransferNFT, currentOwner, test, asPromise, saveUnityLoginData, setDelist, getAllGame, seedNft, getAllNft, delAllNFT, getNFTDetails, afterMintNFT, requestMintNFT, setApprove } = require('./function');
 const tokenReceiverForMint = "0xdD9a69A4380FFFA49f1962b5dDE7E3143BE37E86";
 const privateKey = "d6181c28b8c41da16ef1eed12d7430abd5e9d76b6e72356cbedccbde4787dab4";
 const provider = 'https://data-seed-prebsc-1-s1.binance.org:8545/'
@@ -54,7 +54,7 @@ app.get('/loginUnity/:id', async (req, res) => {
 
 app.post('/saveDataBuyItems', async (req, res) => {
     console.log(req.body.address+ " : " +req.body.id);
-    await savePaymentData(req.body.address, req.body.id );
+    await saveUnityPaymentData(req.body.address, req.body.id );
     res.json(req.body.id);
 })
 
@@ -63,6 +63,12 @@ app.post('/getDataBuyItems', async (req, res) => {
     const result = await getPaymentUnityData(req.body.address, 6)
     res.json(result);
 })
+
+app.post('/SavePoint', async (req, res) => {
+    const result = await SavePoint(req.body.address, req.body.point);
+    res.json(result);
+})
+
 
 app.get('/buyItems/:id', async (req, res) => {
     res.render("items");
@@ -109,11 +115,17 @@ app.post('/mint', async function (req, res) {
 
 app.get('/mk', async function (req, res) {
     const allNFT = await getAllNft();
-    res.render("marketplace", { nfts: allNFT });
+    const allActivity = await GetActivityData();
+    res.render("marketplace", { nfts: allNFT, activity:allActivity });
     //res.json({ nfts: allNFT })
 })
 app.get('/rp', function (req, res) {
-    res.render("report");
+    res.render("report",{ profile: null, activity: null } );
+})
+app.get('/rp:id', async function (req, res) {
+    const userProfile = await GetProfileData(req.params.id);
+    const allActivity = await GetPaymentData(req.params.id);
+    res.render("report", { profile: userProfile, activity: allActivity });
 })
 app.get('/nft:id', async function (req, res) {
     console.log(req.params.id);
@@ -186,11 +198,13 @@ app.post('/buyNFT', async function (req, res) {
         const tx = {
             to: contractAddress,
             chainId: '97',
+            gasPrice: "20000000000",
+            gas: "100000",
             data: contract.methods.safeTransferFrom(await currentOwner(req.body.id), req.body.address, req.body.id).encodeABI()
         };
         const signPromise = await web3.eth.accounts.signTransaction(tx, privateKey);
         const receipt = await web3.eth.sendSignedTransaction(signPromise.rawTransaction);
-        console.log(receipt);
+        await saveActivityData(1, await currentOwner(req.body.id), req.body.address, req.body.price, req.body.id, receipt.transactionHash)
         await afterTransferNFT(req.body.id, req.body.address);
     }
 })
@@ -198,18 +212,18 @@ app.post('/buyNFT', async function (req, res) {
 app.post('/sendPayLoad', (req,res)=>{
     let response = ''
     try {
-        const payLoad = req.body.jsonpayload
-        console.log(payLoad)
+        const payLoad = req.body.jsonpayload      
         const jsonObjec = JSON.parse(payLoad)
+
+        console.log("User ID: "+jsonObjec.userId)
+        console.log("Number Record: "+jsonObjec.detailList.length)
+        console.log("Data: : "+payLoad)
         
-        console.log(jsonObjec.userId)
-        console.log(jsonObjec.detailList.length)
         let names = ''
         jsonObjec.detailList.forEach(element => {
             names += element.name + ","
         });
         names = names.substring(0,names.length -1) // remove the last ","
-        console.log(jsonObjec.detailList[0].name)
         response = {
             'uploadResponseCode' :'SUCCESS',
             'userid' : jsonObjec.userId,

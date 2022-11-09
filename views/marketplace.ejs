@@ -17,57 +17,109 @@
         <div class="containers">
             <div class="suvnav">
                 <div class="navoptions">
-                    <button class="btn"><img
+                    <button class="btn" onclick="toggleDisplay(1);"><img
                             src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAB4AAAAeCAYAAAA7MK6iAAAAAXNSR0IArs4c6QAAAPFJREFUSEvtlNERwiAQRHcr0BIsIR1oKaYytQM7UDuwBEvQCtbBQSeSEI8kih/wffCOdwtEpsVMXBTwz8wX1XlVS1oBUGIXN5Jn657OGUtKhTreiaRr2LT+DmzuvHG962jVJlcji2KqS7gsYlupllQBqEhuwwP6VFtgzZq3cHnoAcAcQB3Cv/JXB1DX3I7kutnl0HBFfykL1DUw9AN5zVOSu8mSZG2FjgZ76MYr3ANwz9DNtFOvVXVfuB5B8jc8ApgFxa2ZmlKdEucO+EdoVHUK2NU24PswvbGzJntOkhYkL9amJwNbgc+6Ak41Nrg+m+o7RNh0H+823dMAAAAASUVORK5CYII=" />
                         Items</button>
-                    <button class="btn"><img
+                    <button class="btn" onclick="toggleDisplay(0);"><img
                             src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAB4AAAAeCAYAAAA7MK6iAAAAAXNSR0IArs4c6QAAAQFJREFUSEvtlWENwkAMRr8qwAISkIAEHAAOkAAOkDAcIAEJSJgFFJR02SW30d66cQcJ7P5u+V77rs0RvnToS1zM4I+Z/x3VzLwDsDXUXYiokm9FOmZmCdfgJyI6FgNLsAGfDhaVQVdqErOCo7CKiPYWOKtqJUyF9/57AFgDOLR3Pk51ooMOXIMS0T2689o9XEqYVH8GsGhVN/AUNFwJM69CIcl1ssIkAMAtgtcAli2g0RsA1hyY4KEOFLgwXFBzj4egsbqoczdUBXuhPfgVwGZIb6y9o3os9J2nzAKP0jalgJfhYmZZFVmRZv9KnSKvk6fYGeyxlOWfWXUWjZ6Q/1P9BB6KkB98ST1aAAAAAElFTkSuQmCC" />
                         Activity</button>
                 </div>
             </div>
-            <div class="filter">
-                Filter
-                <div class="category">
-                    <ul>
-                        <li><input class="form-check-input" type="checkbox" name="" id=""> All</li>
-                        <li><input class="form-check-input" type="checkbox" name="" id=""> Minted</li>
-                        <li><input class="form-check-input" type="checkbox" name="" id=""> Un-Minted</li>
-                    </ul>
+            <div class="ItemsPage" id="ItemsPage">
+                <div class="filter">
+                    Filter
+                    <div class="category">
+                        <ul>
+                            <li><input class="form-check-input" type="checkbox" name="" id="" onSelect="() => {Console.log(1)}"> Minted</li>
+                            <li><input class="form-check-input" type="checkbox" name="" id=""> Un-Minted</li>
+                        </ul>
 
+                    </div>
+                    <a class="btn shownav btn-outline-success my-2 my-sm-0" href="#nav3"><i
+                            class='bx bx-chevron-up-circle' style='color:#f8f8f8'></i></a>
                 </div>
-                <button class="btn btn-outline-info my-2 my-sm-0" type="submit"><i
-                        class='bx bx-search bx-tada-hover'></i> Find</button>
-                <a class="btn shownav btn-outline-success my-2 my-sm-0" href="#nav3"><i class='bx bx-chevron-up-circle'
-                        style='color:#f8f8f8'></i></a>
-            </div>
-            <div class="groupitems">
-                <% nfts.forEach(function(nft) { %>
-                    <a href="/nft<%=nft._nftId%>">
-                        <div id="items-<%= nft._nftId%>" class="items">
-                            <div class="productimg"><img src="<%=nft._nftImage%>" width="273px" height="273px" alt="">
-                            </div>
-                            <div class="productdes">
-                                <div class="productdes__colection">
-                                    <p>GameBox Collection</p>
+                <div class="groupitems">
+                    <% nfts.forEach(function(nft) { %>
+                        <a href="/nft<%=nft._nftId%>">
+                            <div id="items-<%= nft._nftId%>" class="items">
+                                <div class="productimg"><img src="<%=nft._nftImage%>" width="273px" height="273px"
+                                        alt="">
                                 </div>
-                                <p class="productdes__name">NFT for test #<%=nft._nftId%>
-                                </p>
+                                <div class="productdes">
+                                    <div class="productdes__colection">
+                                        <p>GameBox Collection</p>
+                                    </div>
+                                    <p class="productdes__name">NFT for test #<%=nft._nftId%>
+                                    </p>
+                                </div>
+                                <div id="owner-<%= nft._nftId%>" style="display: none;">
+                                    <%=nft._nftOwner%>
+                                </div>
+                                <div class="productaction" id="productaction-<%=nft._nftId%>">
+                                    <% if(nft._mintable){ %>
+                                        <p style="color: yellow;">NOT MINTED</p>
+                                        <% } else{ %>
+                                            <% if(nft._isSale){ %>
+                                                <%=nft._nftPrice%>
+                                                    <% } else{ %>
+                                                        <p style="color: green;">Owner not sale this items</p>
+                                                        <% } %>
+                                                            <% } %>
+                                </div>
                             </div>
-                            <div id="owner-<%= nft._nftId%>" style="display: none;"><%=nft._nftOwner%></div>
-                            <div class="productaction" id="productaction-<%=nft._nftId%>">
-                                <% if(nft._mintable){ %>
-                                    <p style="color: yellow;">NOT MINTED</p>
-                                    <% } else{ %>
-                                        <% if(nft._isSale){ %>
-                                            <%=nft._nftPrice%>
-                                            <% } else{ %>
-                                                <p style="color: green;">Owner not sale this items</p>
-                                                <% } %>
+                        </a>
+                        <% })%>
+                </div>
+            </div>
+            <div class="ActivityPage" id="ActivityPage" style="display: none">
+                <div class="activity">
+                    <div class="transfered">
+                        <table class="table">
+                            <thead>
+                                <tr>
+                                    <th scope="col">Type</th>
+                                    <th scope="col">NFT</th>
+                                    <th scope="col">Price</th>
+                                    <th scope="col">From</th>
+                                    <th scope="col">To</th>
+                                    <th scope="col">Detail</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <% activity.forEach(function(data) { %>
+                                    <tr>
+                                        <th scope="row" style="color: #03fc73">
+                                            <% if(data._type==1){ %>
+                                                Sell
+                                                <% } else{ %>
+                                                    Listing
                                                     <% } %>
-                            </div>
-                        </div>
-                    </a>
-                    <% })%>
+                                        </th>
+                                        <td class="address">
+                                            BoxGame Collection #<%=data._nftId%>
+                                        </td>
+                                        <td class="address">
+                                            <%=data._price%>
+                                        </td>
+                                        <td class="address">
+                                            <%=data._addressFrom%>
+                                        </td>
+                                        <td class="address">
+                                            <% if(data._type==1){ %>
+                                                <%=data._addressTo%>
+                                                    <% } else{ %>
+                                                        Nope!
+                                                        <% } %>
+                                        </td>
+                                        <td class="address">
+                                            <a href="<%=data._link%>">View</a>
+                                        </td>
+                                    </tr>
+                                    <% })%>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
             </div>
         </div>
 
@@ -100,14 +152,27 @@
             let calY = (((i - 1) - ((i - 1) % 4)) / 4);
             let Y = calY * 449;
             document.getElementById("items-" + i).style.transform = "translate(" + X + "px, " + Y + "px)";
-            if( account && account == document.getElementById("owner-"+i).innerHTML.toString()){
-            document.getElementById("productaction-" + i).innerHTML = "You own this Items";
-            document.getElementById("productaction-" + i).style.color = "blue";
+            if (account && account == document.getElementById("owner-" + i).innerHTML.toString()) {
+                document.getElementById("productaction-" + i).innerHTML = "You own this Items";
+                document.getElementById("productaction-" + i).style.color = "blue";
             }
         }
     };
     async function getAccount() {
         const accounts = await ethereum.request({ method: 'eth_requestAccounts' });
+        const showAccount = document.querySelector('.showAccount');
+        document.getElementById("btn-connect").innerHTML = "";
+        const account = accounts[0];
+        showAccount.innerHTML = account;
         return accounts[0]
+    }
+    function toggleDisplay(id){
+        if(id == 1){
+            document.getElementById("ActivityPage").style.display = "none";
+            document.getElementById("ItemsPage").style.display = "block";
+        }else{
+            document.getElementById("ActivityPage").style.display = "block";
+            document.getElementById("ItemsPage").style.display = "none";
+        }
     }
 </script>
