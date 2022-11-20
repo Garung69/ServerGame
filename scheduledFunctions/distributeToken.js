@@ -6,7 +6,7 @@ const Web3 = require('web3')
 const { resetPoint, calPoint, savePaymentData } = require('../function');
 const Abi = require('../tokenabi.json');
 async function initScheduledJobs() {
-    const scheduledJobFunction = CronJob.schedule("29 16 * * *", async () => {
+    const scheduledJobFunction = CronJob.schedule("30 00 * * *", async () => {
         distributeToken()
     });
 

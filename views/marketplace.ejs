@@ -151,8 +151,8 @@
             }
             let calY = (((i - 1) - ((i - 1) % 4)) / 4);
             let Y = calY * 449;
-            document.getElementById("items-" + i).style.transform = "translate(" + X + "px, " + Y + "px)";
-            if (account && account == document.getElementById("owner-" + i).innerHTML.toString()) {
+            document.getElementById("items-" + i).style.transform = "translate(" + X + "px, " + Y + "px)";  
+            if (account && account == document.getElementById("owner-" + i).innerHTML.toString().trim()) {
                 document.getElementById("productaction-" + i).innerHTML = "You own this Items";
                 document.getElementById("productaction-" + i).style.color = "blue";
             }

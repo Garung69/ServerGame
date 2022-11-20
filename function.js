@@ -147,14 +147,36 @@ async function saveUnityLoginData(address, hash) {
     }
 }
 
-async function saveUnityPaymentData(address, id) {
+async function updateUnityitems(address, _item1, _item2, _item3, _item4, _item5){
     db = await getDB();
     const result = await db.collection("paymentUnity").findOne({ _address: address })
     if (result) {
-        await db.collection("paymentUnity").updateOne({ _address: address }, { $set: { _itemsId: id } })
+        await db.collection("paymentUnity").updateOne({ _address: address }, { $set: { _item1: Number(result._item1) - (_item1), _item2: Number(result._item2) - (_item2), _item3: Number(result._item3) - (_item3), _item4: Number(result._item4) - (_item4), _item5: Number(result._item5) - (_item5)  } })
+    }
+}
+
+async function saveUnityPaymentData(address, id, count, _item1 = 0, _item2 = 0, _item3 = 0, _item4 = 0, _item5 = 0) {
+    if(id==1){
+        _item1 = 1;
+    } if(id==2){
+        _item2 = 1;
+    }
+    if(id==3){
+        _item3 = 1;
+    }
+    if(id==4){
+        _item4 = 1;
+    }
+    if(id==5){
+        _item5 = 1;
+    }
+    db = await getDB();
+    const result = await db.collection("paymentUnity").findOne({ _address: address })
+    if (result) {
+        await db.collection("paymentUnity").updateOne({ _address: address }, { $set: { _item1: Number(result._item1) + (count*_item1), _item2: Number(result._item2) + (count*_item2), _item3: Number(result._item3) + (count*_item3), _item4: Number(result._item4) + (count*_item4), _item5: Number(result._item5) + (count*_item5)  } })
     } else {
-        const newLoginData = { _address: address, _itemsId: id }
-        await db.collection("paymentUnity").insertOne(newLoginData)
+        const newData = { _address: address, _item1:  Number(_item1*count) , _item2:  _item2*count, _item3:  _item3*count, _item4:  _item4*count, _item5:  _item5*count}
+        await db.collection("paymentUnity").insertOne(newData)
     }
 }
 
@@ -195,38 +217,15 @@ async function callBackGetHash(hash, callbackTimes){
 }
 
 
-async function callBackGetItemId(address, callbackTimes){
-    if (callbackTimes == 0)return 0;
+async function getPaymentUnityData(address) {
     db = await getDB();
-    var result = await db.collection("paymentUnity").findOne({ _address: address })
-    if (result){
-        console.log("Data found!")
-        console.log(result);
+    var data = await db.collection("paymentUnity").findOne({ _address: address })
+    if (data){
+        const result = "" + data._item1 + " "+ data._item2 + " " + data._item3 + " " + data._item4 + " " + data._item5;
         return result;
     }
     else{
-        console.log("No data! ~~ Keep callback!!")
-        await delay(10000)
-        var result = await callBackGetHash(address, callbackTimes -1)
-    }
-    if(result){
-        return result;
-    }
-}
-
-async function clearPaymentUnityData(address){
-    db = await getDB();
-    await db.collection("paymentUnity").deleteOne({ _address: address })
-}
-
-async function getPaymentUnityData(address, callbackTimes) {
-    const result = await callBackGetItemId(address, callbackTimes);
-    if (result){
-        await clearPaymentUnityData(result._address);
-        return result._itemsId;
-    }
-    else{
-        return 0;
+        return "0 0 0 0 0";
     }  
 }
 
@@ -238,7 +237,8 @@ async function getLoginUnityData(hash, callbackTimes) {
     if (result){
         console.log("found!")
         if(result._time - Date.now() <= 300000){
-            return result._address;
+            const resultItem = await getPaymentUnityData(result._address)
+            return result._address + " " + resultItem;
         }else{
             return 1;
         }
@@ -357,4 +357,4 @@ async function afterTransferNFT(id, address){
 }
 
 
-module.exports = {GetPaymentData,GetProfileData, savePaymentData, GetActivityData, saveActivityData, saveUnityPaymentData, SavePoint, getPaymentUnityData, afterTransferNFT, currentOwner, asPromise, getLoginUnityData, saveUnityLoginData, setDelist, resetPoint, calPoint, getAllGame, seedNft, getAllNft, delAllNFT, getNFTDetails, afterMintNFT, requestMintNFT, setApprove }
+module.exports = {updateUnityitems, GetPaymentData,GetProfileData, savePaymentData, GetActivityData, saveActivityData, saveUnityPaymentData, SavePoint, getPaymentUnityData, afterTransferNFT, currentOwner, asPromise, getLoginUnityData, saveUnityLoginData, setDelist, resetPoint, calPoint, getAllGame, seedNft, getAllNft, delAllNFT, getNFTDetails, afterMintNFT, requestMintNFT, setApprove }

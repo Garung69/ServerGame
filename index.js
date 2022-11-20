@@ -15,7 +15,7 @@ var express = require('express');
 const Web3 = require('web3')
 const Abi = require('./nftabi.json');
 const { initScheduledJobs } = require('./scheduledFunctions/distributeToken')
-const {GetPaymentData, GetProfileData, calPoint, SavePoint, GetActivityData, getPaymentUnityData, saveUnityPaymentData,saveActivityData, getLoginUnityData,afterTransferNFT, currentOwner, test, asPromise, saveUnityLoginData, setDelist, getAllGame, seedNft, getAllNft, delAllNFT, getNFTDetails, afterMintNFT, requestMintNFT, setApprove } = require('./function');
+const {GetPaymentData, updateUnityitems, GetProfileData, calPoint, SavePoint, GetActivityData, getPaymentUnityData, saveUnityPaymentData,saveActivityData, getLoginUnityData,afterTransferNFT, currentOwner, test, asPromise, saveUnityLoginData, setDelist, getAllGame, seedNft, getAllNft, delAllNFT, getNFTDetails, afterMintNFT, requestMintNFT, setApprove } = require('./function');
 const tokenReceiverForMint = "0xdD9a69A4380FFFA49f1962b5dDE7E3143BE37E86";
 const privateKey = "d6181c28b8c41da16ef1eed12d7430abd5e9d76b6e72356cbedccbde4787dab4";
 const provider = 'https://data-seed-prebsc-1-s1.binance.org:8545/'
@@ -38,6 +38,7 @@ initScheduledJobs();
 
 app.post('/loginDataHandle', async (req, res) => {
     await saveUnityLoginData(req.body.account, req.body.hash)
+    res.json("SUCCESS")
 })
 
 app.post('/loginUnityHandle', async (req, res) => {
@@ -46,20 +47,23 @@ app.post('/loginUnityHandle', async (req, res) => {
     res.json(result);
 })
 
+
 app.get('/loginUnity/:id', async (req, res) => {
     res.render("login");
 })
 
+app.post('/saveDataUseItems', async (req, res) => {
+    await updateUnityitems(req.body.address, req.body.item1 , req.body.item2 , req.body.item3 , req.body.item4 , req.body.item5 );
+    res.json(req.body.address);
+})
 
 app.post('/saveDataBuyItems', async (req, res) => {
-    console.log(req.body.address+ " : " +req.body.id);
-    await saveUnityPaymentData(req.body.address, req.body.id );
+    await saveUnityPaymentData(req.body.address, req.body.id , req.body.count);
     res.json(req.body.id);
 })
 
 app.post('/getDataBuyItems', async (req, res) => {
-    console.log("Requset from unity: "+req.body.address);
-    const result = await getPaymentUnityData(req.body.address, 6)
+    const result = await getPaymentUnityData(req.body.address)
     res.json(result);
 })
 
@@ -69,7 +73,7 @@ app.post('/SavePoint', async (req, res) => {
 })
 
 
-app.get('/buyItems/:id', async (req, res) => {
+app.get('/buyItems', async (req, res) => {
     res.render("items");
 })
 
@@ -216,6 +220,7 @@ app.post('/sendPayLoad', (req,res)=>{
         const payLoad = req.body.jsonpayload      
         const jsonObjec = JSON.parse(payLoad)
 
+
         console.log("User ID: "+jsonObjec.userId)
         console.log("Number Record: "+jsonObjec.detailList.length)
         console.log("Data: : "+payLoad)
@@ -231,7 +236,6 @@ app.post('/sendPayLoad', (req,res)=>{
             'number': jsonObjec.detailList.length,
             'names' : names,
             'message':'successful upload – all done!'
-
         }
     } catch (error) {
         response = {

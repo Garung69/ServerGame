@@ -1,7 +1,7 @@
 {
     "name": "a",
     "version": "1.0.0",
-    "main": "lib/functions/src/index.js",
+    "main": "index.js",
     "scripts": {
         "server": "node index.js",
         "start": "node index.js"
@@ -26,8 +26,7 @@
         "socket.io": "^4.4.1",
         "web3": "^1.8.0",
         "web3-eth-contract": "^1.7.0",
-        "web3.js-browser": "^0.2.0",
-        "@types/web3": "^1.2.2"
+        "web3.js-browser": "^0.2.0"
     },
     "description": "",
     "devDependencies": {
