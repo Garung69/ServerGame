@@ -49,7 +49,7 @@
                                     <div class="productdes__colection">
                                         <p>GameBox Collection</p>
                                     </div>
-                                    <p class="productdes__name">NFT for test #<%=nft._nftId%>
+                                    <p class="productdes__name">NFT #<%=nft._nftId%>
                                     </p>
                                 </div>
                                 <div id="owner-<%= nft._nftId%>" style="display: none;">
@@ -132,29 +132,38 @@
 </html>
 <script>
     window.onload = async (translate) => {
-        const items = 55 + 1;
-        const account = await getAccount();
-        for (var i = 1; i < items; i++) {
-            let X = 0;
-            let calX = i % 4;
-            if (calX == 1) {
-                X = 0;
+        if (typeof window.ethereum == 'undefined') {
+            console.log("Here!")
+            if (confirm("Please install metamask!") == true) {
+                let url = "https://metamask.io/download/";
+                window.open(url, '_blank').focus();
             }
-            if (calX == 2) {
-                X = 286;
-            }
-            if (calX == 3) {
-                X = 572;
-            }
-            if (calX == 0) {
-                X = 858;
-            }
-            let calY = (((i - 1) - ((i - 1) % 4)) / 4);
-            let Y = calY * 449;
-            document.getElementById("items-" + i).style.transform = "translate(" + X + "px, " + Y + "px)";  
-            if (account && account == document.getElementById("owner-" + i).innerHTML.toString().trim()) {
-                document.getElementById("productaction-" + i).innerHTML = "You own this Items";
-                document.getElementById("productaction-" + i).style.color = "blue";
+        }
+        else{
+            const items = 55 + 1;
+            const account = await getAccount();
+            for (var i = 1; i < items; i++) {
+                let X = 0;
+                let calX = i % 4;
+                if (calX == 1) {
+                    X = 0;
+                }
+                if (calX == 2) {
+                    X = 286;
+                }
+                if (calX == 3) {
+                    X = 572;
+                }
+                if (calX == 0) {
+                    X = 858;
+                }
+                let calY = (((i - 1) - ((i - 1) % 4)) / 4);
+                let Y = calY * 449;
+                document.getElementById("items-" + i).style.transform = "translate(" + X + "px, " + Y + "px)";  
+                if (account && account == document.getElementById("owner-" + i).innerHTML.toString().trim()) {
+                    document.getElementById("productaction-" + i).innerHTML = "You own this Items";
+                    document.getElementById("productaction-" + i).style.color = "blue";
+                }
             }
         }
     };

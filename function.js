@@ -149,9 +149,9 @@ async function saveUnityLoginData(address, hash) {
 
 async function updateUnityitems(address, _item1, _item2, _item3, _item4, _item5){
     db = await getDB();
-    const result = await db.collection("paymentUnity").findOne({ _address: address })
+    const result = await db.collection("itemsUnity").findOne({ _address: address })
     if (result) {
-        await db.collection("paymentUnity").updateOne({ _address: address }, { $set: { _item1: Number(result._item1) - (_item1), _item2: Number(result._item2) - (_item2), _item3: Number(result._item3) - (_item3), _item4: Number(result._item4) - (_item4), _item5: Number(result._item5) - (_item5)  } })
+        await db.collection("itemsUnity").updateOne({ _address: address }, { $set: { _item1: Number(result._item1) - (_item1), _item2: Number(result._item2) - (_item2), _item3: Number(result._item3) - (_item3), _item4: Number(result._item4) - (_item4), _item5: Number(result._item5) - (_item5)  } })
     }
 }
 
@@ -171,12 +171,12 @@ async function saveUnityPaymentData(address, id, count, _item1 = 0, _item2 = 0, 
         _item5 = 1;
     }
     db = await getDB();
-    const result = await db.collection("paymentUnity").findOne({ _address: address })
+    const result = await db.collection("itemsUnity").findOne({ _address: address })
     if (result) {
-        await db.collection("paymentUnity").updateOne({ _address: address }, { $set: { _item1: Number(result._item1) + (count*_item1), _item2: Number(result._item2) + (count*_item2), _item3: Number(result._item3) + (count*_item3), _item4: Number(result._item4) + (count*_item4), _item5: Number(result._item5) + (count*_item5)  } })
+        await db.collection("itemsUnity").updateOne({ _address: address }, { $set: { _item1: Number(result._item1) + (count*_item1), _item2: Number(result._item2) + (count*_item2), _item3: Number(result._item3) + (count*_item3), _item4: Number(result._item4) + (count*_item4), _item5: Number(result._item5) + (count*_item5)  } })
     } else {
         const newData = { _address: address, _item1:  Number(_item1*count) , _item2:  _item2*count, _item3:  _item3*count, _item4:  _item4*count, _item5:  _item5*count}
-        await db.collection("paymentUnity").insertOne(newData)
+        await db.collection("itemsUnity").insertOne(newData)
     }
 }
 
@@ -196,14 +196,13 @@ function asPromise(context, callbackFunction) {
         }
     });
 }
-const delay = ms => new Promise(resolve => setTimeout(resolve, ms))
 
+const delay = ms => new Promise(resolve => setTimeout(resolve, ms))
 async function callBackGetHash(hash, callbackTimes){
     if (callbackTimes == 0)return 0;
     var result = await db.collection("loginUnity").findOne({ _hash: hash })
     if (result){
         console.log("Data found!")
-        console.log(result);
         return result;
     }
     else{
@@ -219,7 +218,7 @@ async function callBackGetHash(hash, callbackTimes){
 
 async function getPaymentUnityData(address) {
     db = await getDB();
-    var data = await db.collection("paymentUnity").findOne({ _address: address })
+    var data = await db.collection("itemsUnity").findOne({ _address: address })
     if (data){
         const result = "" + data._item1 + " "+ data._item2 + " " + data._item3 + " " + data._item4 + " " + data._item5;
         return result;
@@ -263,8 +262,8 @@ async function saveActivityData(type, addressFrom, addressTo, price, nftId, data
     }else{
         const address = addressFrom.slice(0, -4) + "...";
         const SellPrice = price + "BNB";
-        const link = "http://localhost:5000/nft"+nftId;
-        const newData = { _type: 0, _addressFrom: address, _nftId: nftId, _price: SellPrice, _link: link, _time: Date.now() }
+        const link = "http://103.183.113.144:5000/nft"+nftId;
+        const newData = { _type: 0, _addressFrom: address, _addressTo: address, _nftId: nftId, _price: SellPrice, _link: link, _time: Date.now() }
         await db.collection("activity").insertOne(newData)
     }
 }

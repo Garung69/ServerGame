@@ -3,13 +3,6 @@ const { MongoClient, ObjectId, Double } = require('mongodb');
 const URL = 'mongodb+srv://thien:tavip123@gameboxdb.rxhaxzg.mongodb.net/test';
 const DATABASE_NAME = "boxgamedatabase"
 
-async function getDB() {
-    const client = await MongoClient.connect(URL);
-    const dbo = client.db(DATABASE_NAME);
-    return dbo;
-}
-
-
 
 var express = require('express');
 const Web3 = require('web3')
@@ -142,7 +135,7 @@ app.get('/nftdetail/:id', function (req, res) {
         {
             "name": "NFT for test #" + req.params.id,
             "description": "This is one items in the list of the Test Game Blockchain Collection",
-            "image_url": "http://testnftblockchain.herokuapp.com/nftimage/" + req.params.id + ".png",
+            "image_url": "http://103.183.113.144:5000/nftimage/" + req.params.id + ".png",
             "tokenId": req.params.id,
         })));
 })
@@ -219,12 +212,9 @@ app.post('/sendPayLoad', (req,res)=>{
     try {
         const payLoad = req.body.jsonpayload      
         const jsonObjec = JSON.parse(payLoad)
-
-
         console.log("User ID: "+jsonObjec.userId)
         console.log("Number Record: "+jsonObjec.detailList.length)
         console.log("Data: : "+payLoad)
-        
         let names = ''
         jsonObjec.detailList.forEach(element => {
             names += element.name + ","
