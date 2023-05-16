@@ -207,31 +207,3 @@ app.post('/buyNFT', async function (req, res) {
     }
 })
 
-app.post('/sendPayLoad', (req,res)=>{
-    let response = ''
-    try {
-        const payLoad = req.body.jsonpayload      
-        const jsonObjec = JSON.parse(payLoad)
-        console.log("User ID: "+jsonObjec.userId)
-        console.log("Number Record: "+jsonObjec.detailList.length)
-        console.log("Data: : "+payLoad)
-        let names = ''
-        jsonObjec.detailList.forEach(element => {
-            names += element.name + ","
-        });
-        names = names.substring(0,names.length -1) // remove the last ","
-        response = {
-            'uploadResponseCode' :'SUCCESS',
-            'userid' : jsonObjec.userId,
-            'number': jsonObjec.detailList.length,
-            'names' : names,
-            'message':'successful upload – all done!'
-        }
-    } catch (error) {
-        response = {
-            'uploadResponseCode' :'ERROR',
-            'message':'your request is invalid! check the request format!'
-        }
-    }    
-    res.json(response)
-})
